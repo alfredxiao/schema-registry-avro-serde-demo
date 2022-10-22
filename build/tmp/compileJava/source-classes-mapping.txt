@@ -1,0 +1,33 @@
+xiaoyf/demo/schemaregistry/helper/Constants.java
+ xiaoyf.demo.schemaregistry.helper.Constants
+xiaoyf/demo/schemaregistry/producer/LatestTestProducer.java
+ xiaoyf.demo.schemaregistry.producer.LatestTestProducer
+xiaoyf/demo/schemaregistry/avro/decodewithdiffschema/ExtraFieldMismatchDemo.java
+ xiaoyf.demo.schemaregistry.avro.decodewithdiffschema.ExtraFieldMismatchDemo
+xiaoyf/demo/schemaregistry/avro/decodewithdiffschema/RecordNameMismatchDemo.java
+ xiaoyf.demo.schemaregistry.avro.decodewithdiffschema.RecordNameMismatchDemo
+xiaoyf/demo/schemaregistry/avro/decodewithdiffschema/FieldTypeMismatchDemo.java
+ xiaoyf.demo.schemaregistry.avro.decodewithdiffschema.FieldTypeMismatchDemo
+xiaoyf/demo/schemaregistry/avro/encoding/BasicEncodeDecodeDemo.java
+ xiaoyf.demo.schemaregistry.avro.encoding.BasicEncodeDecodeDemo
+xiaoyf/demo/schemaregistry/model/User.java
+ xiaoyf.demo.schemaregistry.model.User
+ xiaoyf.demo.schemaregistry.model.User$Builder
+xiaoyf/demo/schemaregistry/helper/Logger.java
+ xiaoyf.demo.schemaregistry.helper.Logger
+xiaoyf/demo/schemaregistry/avro/decodewithdiffschema/FieldOrderMismatchDemo.java
+ xiaoyf.demo.schemaregistry.avro.decodewithdiffschema.FieldOrderMismatchDemo
+xiaoyf/demo/schemaregistry/avro/Utilities.java
+ xiaoyf.demo.schemaregistry.avro.Utilities
+xiaoyf/demo/schemaregistry/avro/decodewithdiffschema/FieldNameMismatchDemo.java
+ xiaoyf.demo.schemaregistry.avro.decodewithdiffschema.FieldNameMismatchDemo
+xiaoyf/demo/schemaregistry/avro/encoding/ComplexTypeDemo.java
+ xiaoyf.demo.schemaregistry.avro.encoding.ComplexTypeDemo
+xiaoyf/demo/schemaregistry/avro/A10_SpecificRecordDemo.java
+ xiaoyf.demo.schemaregistry.avro.A10_SpecificRecordDemo
+xiaoyf/demo/schemaregistry/consumer/LatestTestConsumer.java
+ xiaoyf.demo.schemaregistry.consumer.LatestTestConsumer
+xiaoyf/demo/schemaregistry/avro/encoding/SimpleTypesDemo.java
+ xiaoyf.demo.schemaregistry.avro.encoding.SimpleTypesDemo
+xiaoyf/demo/schemaregistry/avro/encoding/CaseSensitiveDemo.java
+ xiaoyf.demo.schemaregistry.avro.encoding.CaseSensitiveDemo

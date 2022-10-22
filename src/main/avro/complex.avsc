@@ -1,0 +1,36 @@
+{
+    "type": "record",
+    "name": "Product",
+    "namespace": "xiaoyf.demo.schemaregistry.model",
+    "fields": [
+        {
+            "name" : "id",
+            "type" : "string"
+        },
+        {
+            "name" : "name",
+            "type" : "string"
+        },
+        {
+            "name" : "category",
+            "type" : {
+                "type": "record",
+                "name": "CategoryType",
+                "fields": [
+                    {
+                        "name" : "catId",
+                        "type" : "string"
+                    },
+                    {
+                        "name" : "catName",
+                        "type" : "string"
+                    },
+                    {
+                        "name": "additional",
+                        "type": {"type": "map", "values": "string"}
+                    }
+                ]
+            }
+        }
+    ]
+}

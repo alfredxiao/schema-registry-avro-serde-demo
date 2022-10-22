@@ -1,0 +1,27 @@
+plugins {
+	//id "com.github.davidmc24.gradle.plugin.avro" version "1.0.0"
+	id 'java'
+}
+
+group = 'xiaoyf.demo.schemaregistry'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+	maven { url "https://packages.confluent.io/maven/" }
+}
+
+dependencies {
+	implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '2.6.1'
+	implementation group: 'org.apache.avro', name: 'avro', version: '1.10.2'
+	implementation group: 'io.confluent', name: 'kafka-avro-serializer', version: '6.1.0'
+	implementation group: 'io.confluent', name: 'kafka-schema-serializer', version: '6.1.0'
+	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.12.13'
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
+}
+
+test {
+	useJUnitPlatform()
+}
