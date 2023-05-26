@@ -6,8 +6,8 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import xiaoyf.demo.schemaregistry.helper.Logger;
 
-import static xiaoyf.demo.schemaregistry.avro.Utilities.extractGenericRecord;
-import static xiaoyf.demo.schemaregistry.avro.Utilities.recordToBytes;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.bytesToGenericRecord;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.genericRecordToBytes;
 
 /**
  * FieldNameMismatchDemo demonstrates decoding using a schema with different field name.
@@ -47,10 +47,10 @@ public class FieldNameMismatchDemo {
         user.put("name", "alfred");
         Logger.log("user created: " + user);
 
-        byte[] userBytes = recordToBytes(schema1, user);
+        byte[] userBytes = genericRecordToBytes(schema1, user);
 
         Schema schema2 = new Parser().parse(SCHEMA2);
-        GenericRecord userRead = extractGenericRecord(schema2, userBytes);
+        GenericRecord userRead = bytesToGenericRecord(schema2, userBytes);
         Logger.log("user read from bytes:" + userRead);
     }
 }

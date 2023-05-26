@@ -1,0 +1,19 @@
+{
+    "type": "record",
+    "name": "LatestTest",
+    "fields": [
+        {
+            "name" : "id",
+            "type" : "string"
+        },
+        {
+            "name" : "name",
+            "type" : "string"
+        },
+        {
+            "name" : "location",
+            "type" : ["null", "string"],
+            "default":  null
+        }
+    ]
+}

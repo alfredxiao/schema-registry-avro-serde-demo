@@ -7,8 +7,9 @@ import org.apache.avro.generic.GenericRecord;
 import xiaoyf.demo.schemaregistry.avro.Utilities;
 import xiaoyf.demo.schemaregistry.helper.Logger;
 
-import static xiaoyf.demo.schemaregistry.avro.Utilities.extractGenericRecord;
-import static xiaoyf.demo.schemaregistry.avro.Utilities.recordToBytes;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.bytesToGenericRecord;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.genericRecordToBytes;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.stringToSchema;
 
 public class BasicDefaultValueDemo {
 
@@ -29,17 +30,17 @@ public class BasicDefaultValueDemo {
             "}";
 
     public static void main(String[] args) throws Exception {
-        Schema schema = new Parser().parse(SCHEMA);
+        Schema schema = stringToSchema(SCHEMA);
 
         GenericRecord user = new GenericData.Record(schema);
         user.put("id", "001");
         // user.put("id", schema.getField("id").defaultVal());
         user.put("name", "alfred");
 
-        byte[] bytes = recordToBytes(schema, user);
+        byte[] bytes = genericRecordToBytes(schema, user);
         Utilities.logBytesHex(bytes);
 
-        GenericRecord read = extractGenericRecord(schema, bytes);
+        GenericRecord read = bytesToGenericRecord(schema, bytes);
         Logger.log("user read from bytes:" + read);
     }
 }

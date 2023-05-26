@@ -7,8 +7,8 @@ import org.apache.avro.generic.GenericRecord;
 import xiaoyf.demo.schemaregistry.avro.Utilities;
 import xiaoyf.demo.schemaregistry.helper.Logger;
 
-import static xiaoyf.demo.schemaregistry.avro.Utilities.extractGenericRecord;
-import static xiaoyf.demo.schemaregistry.avro.Utilities.recordToBytes;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.bytesToGenericRecord;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.genericRecordToBytes;
 
 /**
  * MissingFieldDemo demonstrates decoding with a schema with fewer fields defined
@@ -58,14 +58,14 @@ public class MissingFieldDemo {
         userOrder1.put("name", "alfred");
         userOrder1.put("location", "XXX");
 
-        byte[] bytes =recordToBytes(schemaOrder1, userOrder1);
+        byte[] bytes = genericRecordToBytes(schemaOrder1, userOrder1);
         Utilities.logBytesHex(bytes);
 
-        GenericRecord user1ReadViaSchemaOrder1 = extractGenericRecord(schemaOrder1, bytes);
+        GenericRecord user1ReadViaSchemaOrder1 = bytesToGenericRecord(schemaOrder1, bytes);
         Logger.log("user1 read via schemaOrder1:" + user1ReadViaSchemaOrder1);
 
         Schema schemaOrder2 = new Parser().parse(SCHEMA_NAME2);
-        GenericRecord user1ReadViaSchemaOrder2 = extractGenericRecord(schemaOrder2, bytes);
+        GenericRecord user1ReadViaSchemaOrder2 = bytesToGenericRecord(schemaOrder2, bytes);
         Logger.log("user2 read via schemaOrder2:" + user1ReadViaSchemaOrder2);
     }
 }

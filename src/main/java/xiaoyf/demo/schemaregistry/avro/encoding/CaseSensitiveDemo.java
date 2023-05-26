@@ -6,8 +6,9 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import xiaoyf.demo.schemaregistry.helper.Logger;
 
-import static xiaoyf.demo.schemaregistry.avro.Utilities.extractGenericRecord;
-import static xiaoyf.demo.schemaregistry.avro.Utilities.recordToBytes;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.bytesToGenericRecord;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.genericRecordToBytes;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.stringToSchema;
 
 public class CaseSensitiveDemo {
 
@@ -35,17 +36,17 @@ public class CaseSensitiveDemo {
     final static String SCHEMA = schemaString("User", "id", "ID");
 
     public static void main(String[] args) throws Exception {
-        Schema schema = new Parser().parse(SCHEMA);
+        Schema schema = stringToSchema(SCHEMA);
 
         GenericRecord user = new GenericData.Record(schema);
         user.put("id", "AB");
         user.put("ID", "XY");
         Logger.log("user created: " + user);
 
-        byte[] bytes = recordToBytes(schema, user);
+        byte[] bytes = genericRecordToBytes(schema, user);
 
 
-        GenericRecord read = extractGenericRecord(schema, bytes);
+        GenericRecord read = bytesToGenericRecord(schema, bytes);
         Logger.log("user read from bytes:" + read);
     }
 }

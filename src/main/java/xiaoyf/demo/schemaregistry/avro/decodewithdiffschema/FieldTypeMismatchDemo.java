@@ -6,9 +6,9 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import xiaoyf.demo.schemaregistry.helper.Logger;
 
-import static xiaoyf.demo.schemaregistry.avro.Utilities.extractGenericRecord;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.bytesToGenericRecord;
 import static xiaoyf.demo.schemaregistry.avro.Utilities.logBytesHex;
-import static xiaoyf.demo.schemaregistry.avro.Utilities.recordToBytes;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.genericRecordToBytes;
 
 /**
  * FieldTypeMismatchDemo demonstrates decoding with type mismatch
@@ -52,16 +52,16 @@ public class FieldTypeMismatchDemo {
         userOrder1.put("id", "XYZ");
         userOrder1.put("age", "0");
 
-        byte[] bytes = recordToBytes(schemaOrder1, userOrder1);
+        byte[] bytes = genericRecordToBytes(schemaOrder1, userOrder1);
 
-        GenericRecord user1ReadViaSchemaOrder1 = extractGenericRecord(schemaOrder1, bytes);
+        GenericRecord user1ReadViaSchemaOrder1 = bytesToGenericRecord(schemaOrder1, bytes);
         Logger.log("user1 read via schemaOrder1:" + user1ReadViaSchemaOrder1);
         logBytesHex(bytes);
 
         Schema schemaOrder2 = new Parser().parse(SCHEMA_ORDER2);
-        GenericRecord user1ReadViaSchemaOrder2 = extractGenericRecord(schemaOrder2, bytes);
+        GenericRecord user1ReadViaSchemaOrder2 = bytesToGenericRecord(schemaOrder2, bytes);
         Logger.log("user2 read via schemaOrder2:" + user1ReadViaSchemaOrder2);
-        logBytesHex(recordToBytes(schemaOrder2, user1ReadViaSchemaOrder2));
+        logBytesHex(genericRecordToBytes(schemaOrder2, user1ReadViaSchemaOrder2));
     }
 }
 

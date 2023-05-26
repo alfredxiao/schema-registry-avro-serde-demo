@@ -7,9 +7,10 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import xiaoyf.demo.schemaregistry.helper.Logger;
 
-import static xiaoyf.demo.schemaregistry.avro.Utilities.extractGenericRecord;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.bytesToGenericRecord;
 import static xiaoyf.demo.schemaregistry.avro.Utilities.logBytesHex;
-import static xiaoyf.demo.schemaregistry.avro.Utilities.recordToBytes;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.genericRecordToBytes;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.stringToSchema;
 
 public class SimpleTypesDemo {
 
@@ -52,7 +53,7 @@ public class SimpleTypesDemo {
             "}";
 
     public static void main(String[] args) throws Exception {
-        Schema schema = new Parser().parse(SCHEMA);
+        Schema schema = stringToSchema(SCHEMA);
 
         GenericRecord record = new GenericData.Record(schema);
         record.put("f1", 1);     // 02
@@ -66,10 +67,10 @@ public class SimpleTypesDemo {
 
         Logger.log("Avro Record: " + record);
 
-        byte[] bytes = recordToBytes(schema, record);
+        byte[] bytes = genericRecordToBytes(schema, record);
         logBytesHex(bytes);
 
-        GenericRecord recordRead = extractGenericRecord(schema, bytes);
+        GenericRecord recordRead = bytesToGenericRecord(schema, bytes);
         Logger.log("record read from bytes:" + recordRead);
     }
 }

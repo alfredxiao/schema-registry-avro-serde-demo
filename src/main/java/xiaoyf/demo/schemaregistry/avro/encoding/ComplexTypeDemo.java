@@ -9,9 +9,9 @@ import xiaoyf.demo.schemaregistry.helper.Logger;
 import java.io.File;
 import java.util.Map;
 
-import static xiaoyf.demo.schemaregistry.avro.Utilities.extractGenericRecord;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.bytesToGenericRecord;
 import static xiaoyf.demo.schemaregistry.avro.Utilities.logBytesHex;
-import static xiaoyf.demo.schemaregistry.avro.Utilities.recordToBytes;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.genericRecordToBytes;
 
 public class ComplexTypeDemo {
 
@@ -30,9 +30,9 @@ public class ComplexTypeDemo {
 
         product.put("category", category);
 
-        byte[] bytes = recordToBytes(productSchema, product);
+        byte[] bytes = genericRecordToBytes(productSchema, product);
 
-        GenericRecord read = extractGenericRecord(productSchema, bytes);
+        GenericRecord read = bytesToGenericRecord(productSchema, bytes);
         Logger.log("Product read:" + read);
 
         logBytesHex(bytes);
