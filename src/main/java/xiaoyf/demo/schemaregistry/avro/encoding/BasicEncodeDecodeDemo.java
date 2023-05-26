@@ -1,7 +1,6 @@
 package xiaoyf.demo.schemaregistry.avro.encoding;
 
 import org.apache.avro.Schema;
-import org.apache.avro.Schema.Parser;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import xiaoyf.demo.schemaregistry.avro.Utilities;

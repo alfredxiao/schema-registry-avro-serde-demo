@@ -52,5 +52,5 @@ public class CaseSensitiveDemo {
 }
 
 /* NOTE
- - field names are case-sensitive
+ - field names are case-sensitive, "id" and "ID" are two different fields
  */

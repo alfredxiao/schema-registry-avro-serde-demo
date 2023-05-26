@@ -45,6 +45,7 @@ public class ComplexTypeDemo {
  ## Product read:{"id": "123", "name": "XY", "category": {"catId": "456", "catName": "YZ", "additional": {"a": "AB", "b": "CD"}}}
  ## BYTES: 06 31 32 33 04 58 59 06 34 35 36 04 59 5A 04 02 62 04 43 44 02 61 04 41 42 00
  06 31 32 33 04 58 59 -> "id": "123", "name": "XY"
- 06 34 35 36 -> "456"
+ the complex type field starts afterwards straight away
+ 06 34 35 36 -> len: 3, string: "456"
 
  */

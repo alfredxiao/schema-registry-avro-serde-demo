@@ -1,5 +1,5 @@
 plugins {
-	id "com.github.davidmc24.gradle.plugin.avro" version "1.0.0"
+	id "com.github.davidmc24.gradle.plugin.avro" version "1.5.0"
 	id 'java'
 }
 
@@ -14,10 +14,10 @@ repositories {
 }
 
 dependencies {
-	implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '2.6.1'
-	implementation group: 'org.apache.avro', name: 'avro', version: '1.10.2'
-	implementation group: 'io.confluent', name: 'kafka-avro-serializer', version: '6.1.0'
-	implementation group: 'io.confluent', name: 'kafka-schema-serializer', version: '6.1.0'
+	implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.4.0'
+	implementation group: 'org.apache.avro', name: 'avro', version: '1.11.1'
+	implementation group: 'io.confluent', name: 'kafka-avro-serializer', version: '7.4.0'
+	implementation group: 'io.confluent', name: 'kafka-schema-serializer', version: '7.4.0'
 	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.12.13'
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
 }
