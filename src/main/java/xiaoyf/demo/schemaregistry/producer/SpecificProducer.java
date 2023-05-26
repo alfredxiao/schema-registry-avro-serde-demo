@@ -5,12 +5,10 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import xiaoyf.demo.schemaregistry.model.User;
 
-import java.time.Instant;
 import java.util.Properties;
 
 import static xiaoyf.demo.schemaregistry.helper.Constants.BOOTSTRAP_SERVERS;
 import static xiaoyf.demo.schemaregistry.helper.Constants.SCHEMA_REGISTRY_URL;
-import static xiaoyf.demo.schemaregistry.helper.Constants.SCHEMA_REGISTRY_URL_DIRECT;
 import static xiaoyf.demo.schemaregistry.helper.Constants.USER_TOPIC;
 
 public class SpecificProducer {
@@ -40,6 +38,7 @@ public class SpecificProducer {
 
 ** Serializer
  1. writes a '0' then four bytes for the id value, e.g. '0 0 0 1' if id=1
+    which means the first 5 bytes of a record has the id of the schema of the record
  2. For SpecificRecord producer, it creates SpecificDatumWriter to do the bytes assembly
  3. SpecificDatumWriter's logic
     for each field in schema (fields are ordered in schema)
