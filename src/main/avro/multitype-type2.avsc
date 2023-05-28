@@ -1,0 +1,19 @@
+{
+    "type": "record",
+    "name": "Type2",
+    "namespace": "xiaoyf.demo.schemaregistry.model",
+    "fields": [
+        {
+            "name" : "size",
+            "type" : "int"
+        },
+        {
+            "name" : "date",
+            "type" : "string"
+        },
+        {
+            "name" : "city",
+            "type" : "string"
+        }
+    ]
+}
