@@ -138,4 +138,6 @@ When `auto.register.schemas=true` , publishing v1 object while v2 already regist
 Conclusion:
 - 'use.latest.version' is only applies when 'auto.register.schemas' is set to false.
 - 'use.latest.version=true' is dangerous when there are differences between local version and the latest version
+- 'use.latest.version=true' is necessary when using union types at top level so that we can send objects of multiple
+  types to the same topic (as union)
  */
