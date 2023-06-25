@@ -1,12 +1,12 @@
-buildscript {
-	repositories {
-		mavenCentral()
-		gradlePluginPortal()
-	}
-	dependencies {
-		classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
-	}
-}
+//buildscript {
+//	repositories {
+//		mavenCentral()
+//		gradlePluginPortal()
+//	}
+//	dependencies {
+//		classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
+//	}
+//}
 
 plugins {
 	id "com.github.davidmc24.gradle.plugin.avro" version "1.5.0"
@@ -14,7 +14,8 @@ plugins {
 }
 
 apply plugin: 'java'
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.github.davidmc24.gradle.plugin.avro'
+//apply plugin: 'com.github.johnrengelman.shadow'
 
 group = 'xiaoyf.demo.schemaregistry'
 version = '0.0.1-SNAPSHOT'

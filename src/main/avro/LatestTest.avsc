@@ -1,5 +1,6 @@
 {
     "type": "record",
+    "namespace": "xiaoyf.demo.schemaregistry.model",
     "name": "LatestTest",
     "fields": [
         {

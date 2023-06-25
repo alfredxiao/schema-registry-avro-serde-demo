@@ -7,6 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import xiaoyf.demo.schemaregistry.model.LatestTest;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -17,25 +18,26 @@ import static xiaoyf.demo.schemaregistry.helper.Constants.BOOTSTRAP_SERVERS;
 import static xiaoyf.demo.schemaregistry.helper.Constants.LATEST_TEST_TOPIC;
 import static xiaoyf.demo.schemaregistry.helper.Constants.SCHEMA_REGISTRY_URL;
 
-public class LatestTestConsumer {
+public class LatestTestSpecificConsumer {
 	public static void main(String[] args) {
 		Properties props = new Properties();
 
 		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
-		props.put(ConsumerConfig.GROUP_ID_CONFIG, LatestTestConsumer.class.getName());
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, LatestTestSpecificConsumer.class.getName());
 		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, org.apache.kafka.common.serialization.StringDeserializer.class);
 		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroDeserializer.class);
 		props.put(KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, SCHEMA_REGISTRY_URL);
 		props.put(KafkaAvroDeserializerConfig.USE_LATEST_VERSION, true);
+		props.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
 		props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-		final Consumer<String, GenericRecord> consumer = new KafkaConsumer<String, GenericRecord>(props);
+		final Consumer<String, LatestTest> consumer = new KafkaConsumer<String, LatestTest>(props);
 		consumer.subscribe(Collections.singletonList(LATEST_TEST_TOPIC));
 
 		try {
 			while (true) {
-				ConsumerRecords<String, GenericRecord> records = consumer.poll(Duration.of(1000, ChronoUnit.MILLIS));
-				for (ConsumerRecord<String, GenericRecord> record : records) {
+				ConsumerRecords<String, LatestTest> records = consumer.poll(Duration.of(1000, ChronoUnit.MILLIS));
+				for (ConsumerRecord<String, LatestTest> record : records) {
 					System.out.printf("offset = %d, key = %s, value = %s \n", record.offset(), record.key(), record.value());
 					System.out.println("Value of schema:" + record.value().getSchema());
 				}
