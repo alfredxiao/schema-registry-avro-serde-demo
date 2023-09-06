@@ -1,0 +1,22 @@
+{
+    "type": "array",
+    "items": [
+        "null",
+        {
+            "type": "record",
+            "name": "User",
+            "namespace": "xiaoyf.demo.schemaregistry.model",
+            "fields": [
+                {
+                    "name" : "id",
+                    "type" : "string"
+                },
+                {
+                    "name" : "name",
+                    "type" : "string",
+                    "default": "DEFAULT"
+                }
+            ]
+        }
+    ]
+}

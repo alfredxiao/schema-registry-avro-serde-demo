@@ -32,7 +32,7 @@ public class BasicDefaultValueDemo {
  ## user read from bytes:{"id": "001", "name": "DEFAULT"}
 
  Conclusion:
-  - Default value does not get populated automatically. One has to set field value explicitly.
+  - Default value does not get populated automatically. One has to set field value.
     = In the case of GenericRecord, you set it explicitly;
     = In the case of SpecificRecord, the generated Java object sets it for you.
   - the default values get populated in the bytes
