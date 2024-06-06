@@ -77,10 +77,36 @@ public class Utilities {
     }
 
     public static void logBytesHex(final byte[] bytes) {
+        Logger.log("BYTES: " + bytesHexString(bytes, " "));
+    }
+
+    public static String bytesHexString(final byte[] bytes, final String joint) {
         StringBuilder sb = new StringBuilder();
+
+        boolean first = true;
         for (byte b : bytes) {
-            sb.append(String.format("%02X ", b));
+            if (first) {
+                first = false;
+            } else {
+                sb.append(joint);
+            }
+
+            sb.append(String.format("%02X", b));
         }
-        Logger.log("BYTES: " + sb);
+        return sb.toString();
+    }
+
+    public static byte[] zigzagEncode(int number) throws IOException {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        Encoder encoder = EncoderFactory.get().binaryEncoder(stream, null);
+        encoder.writeInt(number);
+        encoder.flush();
+        return stream.toByteArray();
+    }
+
+    public static int zigzagDecode(byte[] bytes) throws IOException {
+        InputStream in = new ByteArrayInputStream(bytes);
+        BinaryDecoder decoder = DecoderFactory.get().binaryDecoder(in, null);
+        return decoder.readInt();
     }
 }
