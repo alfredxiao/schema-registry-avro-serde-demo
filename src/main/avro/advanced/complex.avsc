@@ -12,22 +12,22 @@
             "type" : "string"
         },
         {
+            "name": "attributes",
+            "type": {"type": "map", "values": "string"}
+        },
+        {
             "name" : "category",
             "type" : {
                 "type": "record",
                 "name": "CategoryType",
                 "fields": [
                     {
-                        "name" : "catId",
+                        "name" : "categoryId",
                         "type" : "string"
                     },
                     {
-                        "name" : "catName",
+                        "name" : "categoryName",
                         "type" : "string"
-                    },
-                    {
-                        "name": "additional",
-                        "type": {"type": "map", "values": "string"}
                     }
                 ]
             }

@@ -1,4 +1,4 @@
-package xiaoyf.demo.schemaregistry.avro.encoding;
+package xiaoyf.demo.schemaregistry.avro.basic;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;

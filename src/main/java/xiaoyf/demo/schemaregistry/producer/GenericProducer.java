@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import static xiaoyf.demo.schemaregistry.avro.Utilities.asSchema;
 import static xiaoyf.demo.schemaregistry.helper.Constants.BOOTSTRAP_SERVERS;
 import static xiaoyf.demo.schemaregistry.helper.Constants.SCHEMA_REGISTRY_URL;
 import static xiaoyf.demo.schemaregistry.helper.Constants.SCHEMA_REGISTRY_URL_DIRECT;
@@ -26,14 +27,12 @@ public class GenericProducer {
         props.put("schema.registry.url", SCHEMA_REGISTRY_URL);
         props.put("auto.register.schemas", true);
         props.put("use.latest.version", false);
+        props.put("avro.use.logical.type.converters", true);
         KafkaProducer<String, GenericRecord> producer = new KafkaProducer<>(props);
 
         String key = "k1";
 
-        String userSchema = new String(Files.readAllBytes(Paths.get("./src/main/avro/user.avsc")));
-
-        Schema.Parser parser = new Schema.Parser();
-        Schema schema = parser.parse(userSchema);
+        Schema schema = asSchema("basic/user.avsc");
         GenericRecord avroRecord = new GenericData.Record(schema);
         avroRecord.put("id", "001");
         avroRecord.put("name", "alfred");

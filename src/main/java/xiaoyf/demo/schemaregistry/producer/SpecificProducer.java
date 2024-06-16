@@ -24,7 +24,7 @@ public class SpecificProducer {
 
         String key = "k2";
 
-        User user = new User("001", "Alfred");
+        User user = new User(1, "Alfred");
 
         ProducerRecord<String, User> record = new ProducerRecord<>(USER_TOPIC, key, user);
         producer.send(record);

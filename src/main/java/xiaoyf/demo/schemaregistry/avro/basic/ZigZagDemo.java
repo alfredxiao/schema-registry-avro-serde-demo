@@ -1,4 +1,4 @@
-package xiaoyf.demo.schemaregistry.avro.encoding;
+package xiaoyf.demo.schemaregistry.avro.basic;
 
 import xiaoyf.demo.schemaregistry.helper.Logger;
 
@@ -11,6 +11,33 @@ import static xiaoyf.demo.schemaregistry.avro.Utilities.bytesHexString;
 import static xiaoyf.demo.schemaregistry.avro.Utilities.zigzagDecode;
 import static xiaoyf.demo.schemaregistry.avro.Utilities.zigzagEncode;
 
+
+/*
+ Purpose: Demonstrates how zigzag encoding look
+
+ Conclusion: When the byte starts with 0, meaning no need for the following byte; when it starts with 1, the next
+   byte is included too.
+
+ Output:
+   int -> encoded hex / binary(bits)
+ ## 0 -> 00 / 00000000.
+ ## 1 -> 02 / 00000010.
+ ## 2 -> 04 / 00000100.
+ ## 3 -> 06 / 00000110.
+ ## 4 -> 08 / 00001000.
+ ## 62 -> 7C / 01111100.
+ ## 63 -> 7E / 01111110.
+ ## 64 -> 80 01 / 10000000.00000001.
+ ## 65 -> 82 01 / 10000010.00000001.
+ ## 8190 -> FC 7F / 11111100.01111111.
+ ## 8191 -> FE 7F / 11111110.01111111.
+ ## 8192 -> 80 80 01 / 10000000.10000000.00000001.
+ ## 8193 -> 82 80 01 / 10000010.10000000.00000001.
+
+ So, it appears that the first bit (of a byte) has implications:
+ 1. if it is 0, no need for next byte;
+ 2. if it is 1, yes, next byte is required.
+ */
 public class ZigZagDemo {
     public static void main(String[] args) throws IOException {
         final int end = 10000;
@@ -44,24 +71,3 @@ public class ZigZagDemo {
                 .mapToObj(i -> byteArray[i]);
     }
 }
-
-/*
-   int -> hex / binary(bits)
- ## 0 -> 00 / 00000000.
- ## 1 -> 02 / 00000010.
- ## 2 -> 04 / 00000100.
- ## 3 -> 06 / 00000110.
- ## 4 -> 08 / 00001000.
- ## 62 -> 7C / 01111100.
- ## 63 -> 7E / 01111110.
- ## 64 -> 80 01 / 10000000.00000001.
- ## 65 -> 82 01 / 10000010.00000001.
- ## 8190 -> FC 7F / 11111100.01111111.
- ## 8191 -> FE 7F / 11111110.01111111.
- ## 8192 -> 80 80 01 / 10000000.10000000.00000001.
- ## 8193 -> 82 80 01 / 10000010.10000000.00000001.
-
- So, it appears that the first bit (of a byte) has implications:
- 1. if it is 0, no need for next byte;
- 2. if it is 1, yes, next byte is required.
- */

@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "Measurement",
+  "namespace": "demo.model",
+  "fields": [
+    {
+      "name" : "subject",
+      "type" : "string"
+    },
+    {
+      "name" : "measurementId",
+      "type" : "long"
+    },
+    {
+      "name" : "measurement",
+      "type" : "long"
+    },
+    {
+      "name": "when",
+      "type": "string"
+    }
+  ]
+}

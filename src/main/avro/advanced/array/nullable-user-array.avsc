@@ -1,15 +1,14 @@
-{
-    "type": "array",
-    "items": [
-        "null",
-        {
+[
+    "null",
+    {
+        "type": "array",
+        "items": {
             "type": "record",
             "name": "User",
-            "namespace": "xiaoyf.demo.schemaregistry.model",
             "fields": [
                 {
                     "name" : "id",
-                    "type" : "string"
+                    "type" : "int"
                 },
                 {
                     "name" : "name",
@@ -18,5 +17,5 @@
                 }
             ]
         }
-    ]
-}
+    }
+]

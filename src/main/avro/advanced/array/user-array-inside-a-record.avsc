@@ -1,0 +1,32 @@
+{
+    "type": "record",
+    "name": "UserCollection",
+    "namespace": "xiaoyf.demo.schemaregistry.model",
+    "fields": [
+        {
+            "name" : "collectionId",
+            "type" : "string"
+        },
+        {
+            "name" : "users",
+            "type" : {
+                "type": "array",
+                "items": {
+                    "type": "record",
+                    "name": "User",
+                    "fields": [
+                        {
+                            "name" : "id",
+                            "type" : "int"
+                        },
+                        {
+                            "name" : "name",
+                            "type" : "string",
+                            "default": "DEFAULT"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

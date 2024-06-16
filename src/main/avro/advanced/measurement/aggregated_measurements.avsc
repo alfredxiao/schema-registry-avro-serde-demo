@@ -1,0 +1,42 @@
+{
+  "type": "record",
+  "name": "MeasurementAggregated",
+  "namespace": "demo.model",
+  "fields": [
+    {
+      "name" : "subject",
+      "type" : "string"
+    },
+    {
+      "name": "winStart",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "winEnd",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "grace",
+      "type": [
+        "null",
+        "long"
+      ],
+      "default": null
+    },
+    {
+      "name": "measurements",
+      "type": {
+        "type": "array",
+        "items": "demo.model.Measurement"
+      }
+    }
+  ]
+}

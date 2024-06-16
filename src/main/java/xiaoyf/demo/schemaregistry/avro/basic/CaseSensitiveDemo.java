@@ -1,4 +1,4 @@
-package xiaoyf.demo.schemaregistry.avro.decodewithdiffschema;
+package xiaoyf.demo.schemaregistry.avro.basic;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Parser;
@@ -8,11 +8,21 @@ import xiaoyf.demo.schemaregistry.helper.Logger;
 
 import static xiaoyf.demo.schemaregistry.avro.Utilities.bytesToGenericRecord;
 import static xiaoyf.demo.schemaregistry.avro.Utilities.genericRecordToBytes;
+import static xiaoyf.demo.schemaregistry.avro.Utilities.stringToSchema;
 
-/**
- * FieldNameMismatchDemo demonstrates decoding using a schema with different field name.
+
+/*
+ Purpose: Demonstrates that avro field names are case sensitive
+
+ Output:
+ ## user created: {"id": "AB", "ID": "XY"}
+ ## user read from bytes:{"id": "AB", "ID": "XY"}
+
+ Conclusion:
+ - field names are case-sensitive, "id" and "ID" are two different fields
  */
-public class FieldNameMismatchDemo {
+
+public class CaseSensitiveDemo {
 
     static String schemaString(
             final String name,
@@ -35,22 +45,20 @@ public class FieldNameMismatchDemo {
                 "}";
     }
 
-    final static String SCHEMA1 = schemaString("User", "id", "name");
-
-    final static String SCHEMA2 = schemaString("Person", "title", "occupation");
+    final static String SCHEMA = schemaString("User", "id", "ID");
 
     public static void main(String[] args) throws Exception {
-        Schema schema1 = new Parser().parse(SCHEMA1);
+        Schema schema = stringToSchema(SCHEMA);
 
-        GenericRecord user = new GenericData.Record(schema1);
-        user.put("id", "001");
-        user.put("name", "alfred");
+        GenericRecord user = new GenericData.Record(schema);
+        user.put("id", "AB");
+        user.put("ID", "XY");
         Logger.log("user created: " + user);
 
-        byte[] userBytes = genericRecordToBytes(schema1, user);
+        byte[] bytes = genericRecordToBytes(schema, user);
 
-        Schema schema2 = new Parser().parse(SCHEMA2);
-        GenericRecord userRead = bytesToGenericRecord(schema2, userBytes);
-        Logger.log("user read from bytes:" + userRead);
+
+        GenericRecord read = bytesToGenericRecord(schema, bytes);
+        Logger.log("user read from bytes:" + read);
     }
 }

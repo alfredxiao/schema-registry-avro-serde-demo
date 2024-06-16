@@ -3,6 +3,7 @@ package xiaoyf.demo.schemaregistry.avro;
 import lombok.SneakyThrows;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericArray;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
@@ -12,6 +13,7 @@ import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
+import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.avro.specific.SpecificRecord;
 import xiaoyf.demo.schemaregistry.helper.Logger;
@@ -38,6 +40,21 @@ public class Utilities {
         BinaryDecoder decoder = DecoderFactory.get().binaryDecoder(in, null);
         return reader.read(null, decoder);
     }
+
+    public static GenericRecord bytesToGenericRecord(Schema schema, GenericData genericData, byte[] bytes) throws IOException {
+        DatumReader<GenericRecord> reader = new GenericDatumReader<>(schema, schema, genericData);
+        InputStream in = new ByteArrayInputStream(bytes);
+        BinaryDecoder decoder = DecoderFactory.get().binaryDecoder(in, null);
+        return reader.read(null, decoder);
+    }
+
+    public static GenericRecord bytesToSpecificRecord(Schema schema, byte[] bytes) throws IOException {
+        DatumReader<GenericRecord> reader = new SpecificDatumReader<>(schema);
+        InputStream in = new ByteArrayInputStream(bytes);
+        BinaryDecoder decoder = DecoderFactory.get().binaryDecoder(in, null);
+        return reader.read(null, decoder);
+    }
+
     public static byte[] genericRecordToBytes(Schema schema, GenericRecord record) throws Exception {
         DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(schema);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -45,6 +62,31 @@ public class Utilities {
         datumWriter.write(record, encoder);
         encoder.flush();
         return stream.toByteArray();
+    }
+
+    public static byte[] genericRecordToBytes(Schema schema, GenericData genericData, GenericRecord record) throws Exception {
+        DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(schema, genericData);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        Encoder encoder = EncoderFactory.get().binaryEncoder(stream, null);
+        datumWriter.write(record, encoder);
+        encoder.flush();
+        return stream.toByteArray();
+    }
+
+    public static byte[] primitiveToBytes(Schema schema, Integer datum) throws Exception {
+        DatumWriter<Integer> datumWriter = new GenericDatumWriter<>(schema);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        Encoder encoder = EncoderFactory.get().binaryEncoder(stream, null);
+        datumWriter.write(datum, encoder);
+        encoder.flush();
+        return stream.toByteArray();
+    }
+
+    public static Integer bytesToPrimitive(Schema schema, byte[] bytes) throws Exception {
+        DatumReader<Integer> reader = new SpecificDatumReader<>(schema);
+        InputStream in = new ByteArrayInputStream(bytes);
+        BinaryDecoder decoder = DecoderFactory.get().binaryDecoder(in, null);
+        return reader.read(null, decoder);
     }
 
     public static byte[] arrayToBytes(Schema schema, GenericArray<GenericRecord> array) throws Exception {
@@ -78,6 +120,10 @@ public class Utilities {
 
     public static void logBytesHex(final byte[] bytes) {
         Logger.log("BYTES: " + bytesHexString(bytes, " "));
+    }
+
+    public static void logBytesHex(final String message, final byte[] bytes) {
+        Logger.log(message + ": " + bytesHexString(bytes, " "));
     }
 
     public static String bytesHexString(final byte[] bytes, final String joint) {

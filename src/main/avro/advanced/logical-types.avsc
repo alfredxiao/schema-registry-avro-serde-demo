@@ -1,0 +1,30 @@
+{
+    "type": "record",
+    "name": "Logika",
+    "namespace": "xiaoyf.demo.schemaregistry.model",
+    "fields": [
+        {
+            "name" : "myDecimal",
+            "type" : {
+                "type": "bytes",
+                "logicalType": "decimal",
+                "precision": 4,
+                "scale": 2
+            }
+        },
+        {
+            "name" : "myInstant",
+            "type" : {
+                "type": "long",
+                "logicalType": "timestamp-millis"
+            }
+        },
+        {
+            "name" : "mySet",
+            "type" : {
+                "type": "string",
+                "logicalType": "string-set"
+            }
+        }
+    ]
+}
