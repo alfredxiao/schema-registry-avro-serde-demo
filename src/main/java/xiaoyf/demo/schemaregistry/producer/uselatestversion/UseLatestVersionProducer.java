@@ -1,4 +1,4 @@
-package xiaoyf.demo.schemaregistry.producer;
+package xiaoyf.demo.schemaregistry.producer.uselatestversion;
 
 
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
@@ -6,52 +6,44 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.errors.SerializationException;
+import xiaoyf.demo.schemaregistry.avro.Utilities;
+import xiaoyf.demo.schemaregistry.helper.ProducerHelper;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Properties;
 
-import static xiaoyf.demo.schemaregistry.helper.Constants.BOOTSTRAP_SERVERS;
 import static xiaoyf.demo.schemaregistry.helper.Constants.LATEST_TEST_TOPIC;
-import static xiaoyf.demo.schemaregistry.helper.Constants.SCHEMA_REGISTRY_URL_DIRECT;
 
-public class LatestTestProducer {
-	public static void main(String[] args) throws Exception {
-		Properties props = new Properties();
-		props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
-		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, org.apache.kafka.common.serialization.StringSerializer.class);
-		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroSerializer.class);
-		props.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, SCHEMA_REGISTRY_URL_DIRECT);
-		props.put(KafkaAvroSerializerConfig.AUTO_REGISTER_SCHEMAS, false);
-		props.put(KafkaAvroSerializerConfig.USE_LATEST_VERSION, true);
-		KafkaProducer<String, GenericRecord> producer = new KafkaProducer<>(props);
 
-		final String timestamp = System.currentTimeMillis() + "";
+public class UseLatestVersionProducer {
 
-		String avsc = new String(Files.readAllBytes(Paths.get("./src/main/avro/LatestTest.avsc")));
-    // String avsc = new String(Files.readAllBytes(Paths.get("./src/main/avro/LatestTest.avsc2")));
-		// v2 has new field called 'location' compared to v1
+    public static void main(String[] args) throws Exception {
+        Properties props = ProducerHelper.defaultProperties();
+        props.put(KafkaAvroSerializerConfig.AUTO_REGISTER_SCHEMAS, false);
+        props.put(KafkaAvroSerializerConfig.USE_LATEST_VERSION, true);
 
-		Schema.Parser parser = new Schema.Parser();
-		Schema schema = parser.parse(avsc);
-		GenericRecord avroRecord = new GenericData.Record(schema);
-		avroRecord.put("id", "01-" + timestamp);
-		avroRecord.put("name", "N1-" + timestamp);
-		//avroRecord.put("location", "L1-" + timestamp);
+        KafkaProducer<String, GenericRecord> producer = new KafkaProducer<>(props);
 
-		ProducerRecord<String, GenericRecord> record = new ProducerRecord<>(LATEST_TEST_TOPIC, timestamp, avroRecord);
-		try {
-			producer.send(record);
-		} catch(SerializationException e) {
-			e.printStackTrace();
-		} finally {
-			producer.flush();
-			producer.close();
-		}
-	}
+        // at this point, v1 and v2 are already registered and v2 is 'latest'
+        Schema schema = Utilities.asSchema("uselatestversion/user_v1.avsc");
+
+        GenericRecord avroRecord = new GenericData.Record(schema);
+        avroRecord.put("id", "01");
+        avroRecord.put("name", "alfred");
+        // v3
+        // avroRecord.put("age", 25);
+
+        ProducerRecord<String, GenericRecord> record = new ProducerRecord<>(LATEST_TEST_TOPIC, avroRecord);
+        try {
+            producer.send(record);
+        } catch (SerializationException e) {
+            e.printStackTrace();
+        } finally {
+            producer.flush();
+            producer.close();
+        }
+    }
 }
 
 /*
@@ -141,6 +133,11 @@ When `auto.register.schemas=true` , publishing v1 object while v2 already regist
 
 Conclusion:
 - 'use.latest.version' is only applies when 'auto.register.schemas' is set to false.
+- When setting use.latest.version=true, it means
+ 1. You have control over schema registration while disallow applications to register them
+ 2. You expect all records in the topic has to conform to the 'latest' version
+ 3. If producer fail to produce conforming records, let them fail
+- what happens when publish v3 while v2 is latest?
 - 'use.latest.version=true' is dangerous when there are differences between local version and the latest version
 - 'use.latest.version=true' is necessary when using union types at top level so that we can send objects of multiple
   types to the same topic (as union)

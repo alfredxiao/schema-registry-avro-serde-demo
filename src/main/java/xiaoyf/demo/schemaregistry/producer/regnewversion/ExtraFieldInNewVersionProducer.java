@@ -1,54 +1,43 @@
-package xiaoyf.demo.schemaregistry.producer;
+package xiaoyf.demo.schemaregistry.producer.regnewversion;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Properties;
-
 import static xiaoyf.demo.schemaregistry.avro.Utilities.stringToSchema;
-import static xiaoyf.demo.schemaregistry.helper.Constants.BOOTSTRAP_SERVERS;
-import static xiaoyf.demo.schemaregistry.helper.Constants.SCHEMA_REGISTRY_URL;
-import static xiaoyf.demo.schemaregistry.helper.Constants.USER_TOPIC;
+import static xiaoyf.demo.schemaregistry.helper.ProducerHelper.defaultProperties;
+import static xiaoyf.demo.schemaregistry.producer.regnewversion.Constants.USER_REG_NEW_VERSION_TOPIC;
 
-public class GenericExtraFieldProducer {
+public class ExtraFieldInNewVersionProducer {
 
     public static void main(String[] args) throws Exception {
-        Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, org.apache.kafka.common.serialization.StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroSerializer.class);
-        props.put("schema.registry.url", SCHEMA_REGISTRY_URL);
-        props.put("auto.register.schemas", true);
-        props.put("use.latest.version", false);
-        KafkaProducer<String, GenericRecord> producer = new KafkaProducer<>(props);
+        KafkaProducer<String, GenericRecord> producer = new KafkaProducer<>(defaultProperties());
 
         String key = "k2";
 
-        final String SCHEMA = "{\n" +
-                "    \"type\": \"record\",\n" +
-                "    \"name\": \"User\",\n" +
-                "    \"namespace\": \"xiaoyf.demo.schemaregistry.model\",\n" +
-                "    \"fields\": [\n" +
-                "        {\n" +
-                "            \"name\" : \"location\",\n" +
-                "            \"type\" : \"string\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"name\" : \"name\",\n" +
-                "            \"type\" : \"string\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"name\" : \"id\",\n" +
-                "            \"type\" : \"string\"\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}";
+        final String SCHEMA = """
+            {
+                 "type": "record",
+                 "name": "User",
+                 "namespace": "xiaoyf.demo.schemaregistry.model",
+                 "fields": [
+                     {
+                         "name" : "location",
+                         "type" : "string"
+                     },
+                     {
+                         "name" : "name",
+                         "type" : "string"
+                     },
+                     {
+                         "name" : "id",
+                         "type" : "string"
+                     }
+                 ]
+            }
+        """;
 
         Schema schema = stringToSchema(SCHEMA);
         GenericRecord avroRecord = new GenericData.Record(schema);
@@ -56,7 +45,7 @@ public class GenericExtraFieldProducer {
         avroRecord.put("name", "alfred");
         avroRecord.put("location", "Melbourne");
 
-        ProducerRecord<String, GenericRecord> record = new ProducerRecord<>(USER_TOPIC, key, avroRecord);
+        ProducerRecord<String, GenericRecord> record = new ProducerRecord<>(USER_REG_NEW_VERSION_TOPIC, key, avroRecord);
         producer.send(record);
         producer.flush();
         producer.close();

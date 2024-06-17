@@ -1,6 +1,6 @@
 {
     "type": "record",
-    "name": "LatestTest",
+    "name": "User",
     "fields": [
         {
             "name" : "id",
@@ -13,6 +13,11 @@
         {
             "name" : "location",
             "type" : ["null", "string"],
+            "default":  null
+        },
+        {
+            "name" : "age",
+            "type" : ["null", "int"],
             "default":  null
         }
     ]

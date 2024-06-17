@@ -1,34 +1,19 @@
-package xiaoyf.demo.schemaregistry.producer;
+package xiaoyf.demo.schemaregistry.producer.basic;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Properties;
-
 import static xiaoyf.demo.schemaregistry.avro.Utilities.asSchema;
-import static xiaoyf.demo.schemaregistry.helper.Constants.BOOTSTRAP_SERVERS;
-import static xiaoyf.demo.schemaregistry.helper.Constants.SCHEMA_REGISTRY_URL;
-import static xiaoyf.demo.schemaregistry.helper.Constants.SCHEMA_REGISTRY_URL_DIRECT;
 import static xiaoyf.demo.schemaregistry.helper.Constants.USER_TOPIC;
+import static xiaoyf.demo.schemaregistry.helper.ProducerHelper.defaultProperties;
 
 public class GenericProducer {
 
     public static void main(String[] args) throws Exception {
-        Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, org.apache.kafka.common.serialization.StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, io.confluent.kafka.serializers.KafkaAvroSerializer.class);
-        props.put("schema.registry.url", SCHEMA_REGISTRY_URL);
-        props.put("auto.register.schemas", true);
-        props.put("use.latest.version", false);
-        props.put("avro.use.logical.type.converters", true);
-        KafkaProducer<String, GenericRecord> producer = new KafkaProducer<>(props);
+        KafkaProducer<String, GenericRecord> producer = new KafkaProducer<>(defaultProperties());
 
         String key = "k1";
 

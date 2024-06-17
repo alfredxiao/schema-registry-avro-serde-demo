@@ -1,7 +1,6 @@
-package xiaoyf.demo.schemaregistry.consumer;
+package xiaoyf.demo.schemaregistry.consumer.uselatestversion;
 
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;

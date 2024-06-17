@@ -1,7 +1,5 @@
-package xiaoyf.demo.schemaregistry.consumer;
+package xiaoyf.demo.schemaregistry.tools;
 
-import io.confluent.kafka.serializers.AbstractKafkaAvroDeserializer;
-import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -15,11 +13,10 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Properties;
 
-public class LogicalGenericConsumerTool {
+public class LogicalTypeGenericConsumerTool {
     public static void main(String[] args) throws Exception {
         // create Options object
         Options options = new Options();
@@ -68,3 +65,6 @@ public class LogicalGenericConsumerTool {
         }
     }
 }
+
+// todo
+// feature: counts, size, filter, print offset/partition
