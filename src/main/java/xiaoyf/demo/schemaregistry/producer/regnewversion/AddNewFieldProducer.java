@@ -10,13 +10,14 @@ import static xiaoyf.demo.schemaregistry.avro.Utilities.stringToSchema;
 import static xiaoyf.demo.schemaregistry.helper.ProducerHelper.defaultProperties;
 import static xiaoyf.demo.schemaregistry.producer.regnewversion.Constants.USER_REG_NEW_VERSION_TOPIC;
 
-public class lessFieldInNewVersionProducer {
+public class AddNewFieldProducer {
 
     public static void main(String[] args) throws Exception {
         KafkaProducer<String, GenericRecord> producer = new KafkaProducer<>(defaultProperties());
 
         String key = "k2";
 
+        // in BACKWARD mode, adding new field is not allowed unless it is optional (having default value)
         final String SCHEMA = """
             {
                  "type": "record",
@@ -25,18 +26,31 @@ public class lessFieldInNewVersionProducer {
                  "fields": [
                      {
                          "name" : "id",
-                         "type" : "string"
+                         "type" : "int"
+                     },
+                     {
+                         "name" : "name",
+                         "type" : "string",
+                         "default": "DEFAULT"
+                     },
+                     {
+                         "name" : "location",
+                         "type" : "string",
+                         "default": "Melbourne"
                      }
                  ]
-            }
+             }
         """;
 
         Schema schema = stringToSchema(SCHEMA);
         GenericRecord avroRecord = new GenericData.Record(schema);
-        avroRecord.put("id", "011");
+        avroRecord.put("id", 3);
+        avroRecord.put("name", "alfred");
+        avroRecord.put("location", "Melbourne");
 
         ProducerRecord<String, GenericRecord> record = new ProducerRecord<>(USER_REG_NEW_VERSION_TOPIC, key, avroRecord);
         producer.send(record).get();
+        producer.flush();
         producer.close();
     }
 }

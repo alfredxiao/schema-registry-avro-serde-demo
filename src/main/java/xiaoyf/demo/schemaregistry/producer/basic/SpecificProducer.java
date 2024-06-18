@@ -17,7 +17,7 @@ public class SpecificProducer {
         User user = new User(1, "Alfred");
 
         ProducerRecord<String, User> record = new ProducerRecord<>(USER_TOPIC, key, user);
-        producer.send(record);
+        producer.send(record).get();
         producer.flush();
         producer.close();
     }

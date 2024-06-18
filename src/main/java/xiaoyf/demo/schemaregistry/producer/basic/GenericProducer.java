@@ -23,7 +23,7 @@ public class GenericProducer {
         avroRecord.put("name", "alfred");
 
         ProducerRecord<String, GenericRecord> record = new ProducerRecord<>(USER_TOPIC, key, avroRecord);
-        producer.send(record);
+        producer.send(record).get();
         producer.flush();
         producer.close();
     }

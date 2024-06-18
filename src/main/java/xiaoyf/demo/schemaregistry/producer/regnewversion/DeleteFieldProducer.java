@@ -10,7 +10,7 @@ import static xiaoyf.demo.schemaregistry.avro.Utilities.stringToSchema;
 import static xiaoyf.demo.schemaregistry.helper.ProducerHelper.defaultProperties;
 import static xiaoyf.demo.schemaregistry.producer.regnewversion.Constants.USER_REG_NEW_VERSION_TOPIC;
 
-public class ExtraFieldInNewVersionProducer {
+public class DeleteFieldProducer {
 
     public static void main(String[] args) throws Exception {
         KafkaProducer<String, GenericRecord> producer = new KafkaProducer<>(defaultProperties());
@@ -24,14 +24,6 @@ public class ExtraFieldInNewVersionProducer {
                  "namespace": "xiaoyf.demo.schemaregistry.model",
                  "fields": [
                      {
-                         "name" : "location",
-                         "type" : "string"
-                     },
-                     {
-                         "name" : "name",
-                         "type" : "string"
-                     },
-                     {
                          "name" : "id",
                          "type" : "string"
                      }
@@ -41,13 +33,10 @@ public class ExtraFieldInNewVersionProducer {
 
         Schema schema = stringToSchema(SCHEMA);
         GenericRecord avroRecord = new GenericData.Record(schema);
-        avroRecord.put("id", "003");
-        avroRecord.put("name", "alfred");
-        avroRecord.put("location", "Melbourne");
+        avroRecord.put("id", "011");
 
         ProducerRecord<String, GenericRecord> record = new ProducerRecord<>(USER_REG_NEW_VERSION_TOPIC, key, avroRecord);
-        producer.send(record);
-        producer.flush();
+        producer.send(record).get();
         producer.close();
     }
 }

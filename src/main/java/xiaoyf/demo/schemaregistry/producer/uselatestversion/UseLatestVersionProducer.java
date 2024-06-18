@@ -15,7 +15,34 @@ import java.util.Properties;
 
 import static xiaoyf.demo.schemaregistry.helper.Constants.LATEST_TEST_TOPIC;
 
+/*
+ Purpose: Demonstrates how 'auto.register.schemas' and 'use.latest.version' relate.
 
+ Conclusion:
+  - When 'auto.register.schemas'=true, producer always produce with the schema associated with the object being
+    produced, meaning 'use.latest.version' is not relevant in such case
+  - When 'auto.register.schemas'=false, 'use.latest.version' is relevant
+    = If 'use.latest.version'=false, producer then expects that the schema associated with the object being produced
+      is already registered, otherwise -> fail!
+    = If 'use.latest.version'=true, producer fetches the latest schema version
+      # If latest schema=the schema associated with the object being produced, no problem
+      # If latest schema > the schema associated with the object being produced, no problem
+      # If latest schema < the schema associated with the object being produced, fail!
+      # Note: '>' and '<' is not simply who is larger, but essentially it is whether the producer is able to generate
+        bytes/object conforming to target version (as recipe) while sourcing from an object made out of a different
+        recipe. For example, User v3 has all v2 fields, then it is a success, but v1 lacking one field in v2 (even
+        though it has default value), would still fail
+  - When setting use.latest.version=true, it means
+     1. You have control over schema registration while disallow applications to register them
+     2. You expect all records in the topic has to conform to the 'latest' version
+     3. If producer fail to produce conforming records, let them fail
+     4. You're kind of 'locking' a topic to a particular schema version
+       - however, this is enforced by producers, not by broker,
+- 'use.latest.version=true' is dangerous when there are differences between local version and the latest version
+- 'use.latest.version=true' is necessary when using union types at top level so that we can send objects of multiple
+  types to the same topic (as union)
+
+ */
 public class UseLatestVersionProducer {
 
     public static void main(String[] args) throws Exception {
@@ -23,20 +50,32 @@ public class UseLatestVersionProducer {
         props.put(KafkaAvroSerializerConfig.AUTO_REGISTER_SCHEMAS, false);
         props.put(KafkaAvroSerializerConfig.USE_LATEST_VERSION, true);
 
+        // at this point, v1 and v2 are already registered and v2 is 'latest'
+        // if not, run pre-register-schemas.sh to register them
+
         KafkaProducer<String, GenericRecord> producer = new KafkaProducer<>(props);
 
-        // at this point, v1 and v2 are already registered and v2 is 'latest'
-        Schema schema = Utilities.asSchema("uselatestversion/user_v1.avsc");
+        GenericRecord user = null;
 
-        GenericRecord avroRecord = new GenericData.Record(schema);
-        avroRecord.put("id", "01");
-        avroRecord.put("name", "alfred");
-        // v3
-        // avroRecord.put("age", 25);
+        final String versionToProduce = "v1"; // v1 or v3
 
-        ProducerRecord<String, GenericRecord> record = new ProducerRecord<>(LATEST_TEST_TOPIC, avroRecord);
+        if ("v1".equals(versionToProduce)) {
+
+            GenericRecord avroRecord = new GenericData.Record(Utilities.asSchema("uselatestversion/user_v1.avsc"));
+            avroRecord.put("id", "01");
+            avroRecord.put("name", "alfred");
+        }
+
+        if ("v3".equals(versionToProduce)) {
+            GenericRecord avroRecord = new GenericData.Record(Utilities.asSchema("uselatestversion/user_v3.avsc"));
+            avroRecord.put("id", "03");
+            avroRecord.put("name", "alfred");
+            avroRecord.put("age", 25);
+        }
+
+        ProducerRecord<String, GenericRecord> record = new ProducerRecord<>(LATEST_TEST_TOPIC, user);
         try {
-            producer.send(record);
+            producer.send(record).get();
         } catch (SerializationException e) {
             e.printStackTrace();
         } finally {
@@ -127,18 +166,4 @@ When `auto.register.schemas=true` , publishing v1 object while v2 already regist
   {"schema":"{\"type\":\"record\",\"name\":\"LatestTest\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"}]}"}
 - HTTP/1.1 200 OK
   {"id":1}
- */
-
-/*
-
-Conclusion:
-- 'use.latest.version' is only applies when 'auto.register.schemas' is set to false.
-- When setting use.latest.version=true, it means
- 1. You have control over schema registration while disallow applications to register them
- 2. You expect all records in the topic has to conform to the 'latest' version
- 3. If producer fail to produce conforming records, let them fail
-- what happens when publish v3 while v2 is latest?
-- 'use.latest.version=true' is dangerous when there are differences between local version and the latest version
-- 'use.latest.version=true' is necessary when using union types at top level so that we can send objects of multiple
-  types to the same topic (as union)
  */
