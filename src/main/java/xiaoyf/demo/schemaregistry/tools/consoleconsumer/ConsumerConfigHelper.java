@@ -15,6 +15,7 @@ public class ConsumerConfigHelper {
     public static final String DEFAULT_BOOTSTRAP_SERVER = "localhost:9092";
     public static final String DEFAULT_SCHEMA_REGISTRY = "http://localhost:8081";
     public static final String DEFAULT_KEY_DESERIALIZER = StringDeserializer.class.getName();
+    //  avro uses io.confluent.kafka.serializers.KafkaAvroDeserializer.class
     public static final String DEFAULT_VALUE_DESERIALIZER = StringDeserializer.class.getName();
     public static final String ALL_PARTITIONS = "all";
     public static final int ALL_PARTITION = -1;
@@ -97,5 +98,9 @@ public class ConsumerConfigHelper {
 
     public int getLimit() {
         return Integer.parseInt(command.getLimit(UNLIMITED));
+    }
+
+    public int getGrepLimit() {
+        return Integer.parseInt(command.getGrepLimit(UNLIMITED));
     }
 }

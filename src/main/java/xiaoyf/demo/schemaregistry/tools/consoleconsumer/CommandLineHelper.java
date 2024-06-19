@@ -6,7 +6,6 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,9 +25,7 @@ public class CommandLineHelper {
     public static final String EXIT_WHEN_END_REACHED = "e";
     public static final String VALUE_FIELDS = "vf";
     public static final String GREP = "g";
-    public static final String GREP_FIRST = "gf";
-    public static final String GREP_LAST = "gl";
-    public static final String FOLLOW = "f";
+    public static final String GREP_LIMIT = "gl";
     public static final String LIMIT = "l";
 
 
@@ -42,16 +39,16 @@ public class CommandLineHelper {
         Options opts = new Options();
         opts.addOption(CONSUMER_CONFIG, true, "config file for consumer");
         opts.addOption(BOOTSTRAP_SERVER, true, "bootstrap server");
-        opts.addOption(TOPIC, true, "topic");
+        opts.addRequiredOption(TOPIC, "--topic", true, "topic");
         opts.addOption(KEY_DESERIALIZER, true, "key deserializer");
-        opts.addOption(VALUE_DESERIALIZER, true, "value deserializer"); // io.confluent.kafka.serializers.KafkaAvroDeserializer.class
+        opts.addOption(VALUE_DESERIALIZER, true, "value deserializer");
         opts.addOption(SCHEMA_REGISTRY, true, "schema registry url");
         opts.addOption(PARTITION, true, "from partition, 'all' means all partitions");
         opts.addOption(OFFSET, true, "from offset, 'beginning' means from beginning，'end' means from end");
         opts.addOption(EXIT_WHEN_END_REACHED, false, "exit when reaching end offset");
         opts.addOption(VALUE_FIELDS, true, "selected fields are display (only when value is avro)");
         opts.addOption(GREP, true, "filter records like grep");
-        opts.addOption(FOLLOW, false, "don't exit, keep following");
+        opts.addOption(GREP_LIMIT, true, "exit when specified number of greps found");
         opts.addOption(LIMIT, true, "stops at number of records seen");
 
         return opts;
@@ -87,6 +84,10 @@ public class CommandLineHelper {
         return cmd.getOptionValue(LIMIT, def);
     }
 
+    public String getGrepLimit(String def) {
+        return cmd.getOptionValue(GREP_LIMIT, def);
+    }
+
     public String getValueFields() {
         return cmd.getOptionValue(VALUE_FIELDS, "");
     }
@@ -111,5 +112,13 @@ public class CommandLineHelper {
         putIfParameterIsNotNull(config, "schema.registry.url", cmd.getOptionValue(SCHEMA_REGISTRY));
 
         return config;
+    }
+
+    public boolean isExitWhenEndReached() {
+        return cmd.hasOption(EXIT_WHEN_END_REACHED);
+    }
+
+    public String getGrep() {
+        return cmd.getOptionValue(GREP);
     }
 }

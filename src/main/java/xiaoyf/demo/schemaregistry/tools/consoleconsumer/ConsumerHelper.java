@@ -1,27 +1,33 @@
 package xiaoyf.demo.schemaregistry.tools.consoleconsumer;
 
 import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.ConsumerConfigHelper.FROM_BEGINNING;
 import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.ConsumerConfigHelper.FROM_BEGINNING_OFFSET;
-import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.ConsumerConfigHelper.FROM_END;
 import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.ConsumerConfigHelper.FROM_END_OFFSET;
 
 public class ConsumerHelper {
-    private ConsoleHelper console;
-    private ConsumerConfigHelper config;
-    private Consumer<Object, Object> consumer;
-    private Set<TopicPartition> expectedAssignment;
+    private final ConsoleHelper console;
+    private final ConsumerConfigHelper config;
+    private final Consumer<Object, Object> consumer;
+    private int recordCount;
+    private int grepHit;
+    private final Map<TopicPartition, Long> seenOffsetsPlusOne;;
 
     ConsumerHelper(Consumer<Object, Object> consumer, ConsumerConfigHelper config, ConsoleHelper console) {
         this.consumer = consumer;
         this.config = config;
         this.console = console;
+        this.recordCount = 0;
+        this.grepHit = 0;
+        this.seenOffsetsPlusOne = new HashMap<>();
     }
 
 
@@ -29,7 +35,7 @@ public class ConsumerHelper {
 
         int partition = config.getPartition();
 
-        expectedAssignment = consumer.partitionsFor(config.getTopic())
+        Set<TopicPartition> expectedAssignment = consumer.partitionsFor(config.getTopic())
                 .stream()
                 .filter(pi -> partition < 0 || pi.partition() == partition)
                 .map(pi -> new TopicPartition(pi.topic(), pi.partition()))
@@ -37,10 +43,8 @@ public class ConsumerHelper {
 
         consumer.assign(expectedAssignment);
 
-        console.println("expected assignment: " + expectedAssignment);
         final long start = System.currentTimeMillis();
         while (System.currentTimeMillis() - start < timeout.toMillis()) {
-            console.println("current assignment: " + consumer.assignment());
 
             if (expectedAssignment.equals(consumer.assignment())) {
                 return;
@@ -69,5 +73,24 @@ public class ConsumerHelper {
 
                 consumer.seek(new TopicPartition(config.getTopic(), config.getPartition()), offset);
         }
+    }
+
+    public boolean hasReachedGrepOrTotalLimit() {
+        return (config.getLimit() > 0 && recordCount >= config.getLimit())
+                || (config.getGrepLimit() > 0 && grepHit >= config.getGrepLimit());
+    }
+
+    public boolean hasReachedTopicEnd() {
+        Map<TopicPartition, Long> endOffsets = consumer.endOffsets(consumer.assignment());
+        return !endOffsets.isEmpty() && seenOffsetsPlusOne.equals(endOffsets);
+    }
+
+    public void visitRecord(ConsumerRecord<Object, Object> record) {
+        seenOffsetsPlusOne.put(new TopicPartition(record.topic(), record.partition()), record.offset() + 1);
+        recordCount++;
+    }
+
+    public void increaseGrepHit() {
+        grepHit++;
     }
 }
