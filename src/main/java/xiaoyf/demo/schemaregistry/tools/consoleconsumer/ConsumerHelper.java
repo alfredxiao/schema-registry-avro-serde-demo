@@ -1,5 +1,6 @@
 package xiaoyf.demo.schemaregistry.tools.consoleconsumer;
 
+import lombok.Getter;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
@@ -7,6 +8,7 @@ import org.apache.kafka.common.TopicPartition;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,20 +16,20 @@ import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.ConsumerConfigHel
 import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.ConsumerConfigHelper.FROM_END_OFFSET;
 
 public class ConsumerHelper {
-    private final ConsoleHelper console;
     private final ConsumerConfigHelper config;
     private final Consumer<Object, Object> consumer;
     private int recordCount;
     private int grepHit;
-    private final Map<TopicPartition, Long> seenOffsetsPlusOne;;
 
-    ConsumerHelper(Consumer<Object, Object> consumer, ConsumerConfigHelper config, ConsoleHelper console) {
+    @Getter
+    private final Map<TopicPartition, Long> visitedOffsets;;
+
+    ConsumerHelper(Consumer<Object, Object> consumer, ConsumerConfigHelper config) {
         this.consumer = consumer;
         this.config = config;
-        this.console = console;
         this.recordCount = 0;
         this.grepHit = 0;
-        this.seenOffsetsPlusOne = new HashMap<>();
+        this.visitedOffsets = new HashMap<>();
     }
 
 
@@ -81,12 +83,20 @@ public class ConsumerHelper {
     }
 
     public boolean hasReachedTopicEnd() {
-        Map<TopicPartition, Long> endOffsets = consumer.endOffsets(consumer.assignment());
-        return !endOffsets.isEmpty() && seenOffsetsPlusOne.equals(endOffsets);
+        boolean endReached = !consumer.assignment().isEmpty();
+        for (TopicPartition tp : consumer.assignment()) {
+            OptionalLong lag = consumer.currentLag(tp);
+            if (lag.isEmpty() || lag.getAsLong() != 0) {
+                endReached = false;
+                break;
+            }
+        }
+
+        return endReached;
     }
 
     public void visitRecord(ConsumerRecord<Object, Object> record) {
-        seenOffsetsPlusOne.put(new TopicPartition(record.topic(), record.partition()), record.offset() + 1);
+        visitedOffsets.put(new TopicPartition(record.topic(), record.partition()), record.offset());
         recordCount++;
     }
 

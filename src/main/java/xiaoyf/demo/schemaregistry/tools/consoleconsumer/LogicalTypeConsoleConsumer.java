@@ -9,6 +9,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Properties;
 import java.util.Set;
 
@@ -26,7 +27,7 @@ public class LogicalTypeConsoleConsumer {
         Properties consumerConfig = config.getConsumerConfig();
 
         final Consumer<Object, Object> consumer = new KafkaConsumer<>(consumerConfig);
-        final ConsumerHelper helper = new ConsumerHelper(consumer, config, console);
+        final ConsumerHelper helper = new ConsumerHelper(consumer, config);
 
         helper.waitForPartitionsAssigned(Duration.ofSeconds(30));
         helper.seekToExpectedOffset();
@@ -47,8 +48,9 @@ public class LogicalTypeConsoleConsumer {
                             || match(valueString, command.getGrep())) {
 
                         helper.increaseGrepHit();
-                        console.printf("p=%d,o=%d,t=%d,k=%s,v=%s\n",
-                                record.partition(), record.offset(), record.timestamp(), keyString, valueString);
+                        console.printf("p=%d,o=%d,ts=%d,t=%s,k=%s,v=%s\n",
+                                record.partition(), record.offset(), record.timestamp(),
+                                Instant.ofEpochMilli(record.timestamp()), keyString, valueString);
                     }
 
                     helper.visitRecord(record);
@@ -59,8 +61,10 @@ public class LogicalTypeConsoleConsumer {
                     }
                 }
 
+                console.log("command.isExitWhenEndReached():" + command.isExitWhenEndReached());
                 if (command.isExitWhenEndReached() && helper.hasReachedTopicEnd()) {
-                    console.println("Topic offset reached, exit");
+                    console.log("Topic offset reached, exit");
+                    console.log("visited offsets:" + helper.getVisitedOffsets());
                     return;
                 }
             }

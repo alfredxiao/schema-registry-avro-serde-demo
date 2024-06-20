@@ -2,7 +2,7 @@ package xiaoyf.demo.schemaregistry.tools.consoleconsumer;
 
 public class ConsoleHelper {
 
-    public void println(String msg) {
+    public void log(Object msg) {
         System.out.println(msg);
     }
 
