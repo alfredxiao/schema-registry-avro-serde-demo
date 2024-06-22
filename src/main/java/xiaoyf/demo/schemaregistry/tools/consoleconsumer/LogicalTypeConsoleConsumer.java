@@ -13,11 +13,11 @@ import java.time.Instant;
 import java.util.Properties;
 import java.util.Set;
 
+import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.CommandLineHelper._GREP;
 import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.MatchHelper.match;
 
 
 public class LogicalTypeConsoleConsumer {
-
 
     public static void main(String[] args) throws Exception {
         final CommandLineHelper command = new CommandLineHelper(args);
@@ -27,12 +27,14 @@ public class LogicalTypeConsoleConsumer {
         Properties consumerConfig = config.getConsumerConfig();
 
         final Consumer<Object, Object> consumer = new KafkaConsumer<>(consumerConfig);
-        final ConsumerHelper helper = new ConsumerHelper(consumer, config);
+        final ConsumerHelper helper = new ConsumerHelper(consumer, config, console);
 
         helper.waitForPartitionsAssigned(Duration.ofSeconds(30));
-        helper.seekToExpectedOffset();
+        helper.seekToExpectedStartingPoint();
 
         try {
+            final String grep = command.getOptionOrNull(_GREP);
+
             while (true) {
                 ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofMillis(200));
 
@@ -43,34 +45,48 @@ public class LogicalTypeConsoleConsumer {
                     String keyString = valueStringToLog(key);
                     String valueString = valueStringToLog(value, config.valueFields());
 
-                    if (StringUtils.isEmpty(command.getGrep())
-                            || match(keyString, command.getGrep())
-                            || match(valueString, command.getGrep())) {
+                    if (StringUtils.isEmpty(grep)
+                            || match(keyString, grep)
+                            || match(valueString, grep)) {
 
-                        helper.increaseGrepHit();
-                        console.printf("p=%d,o=%d,ts=%d,t=%s,k=%s,v=%s\n",
+                        console.logf("p=%d,o=%d,ts=%d,t=%s,k=%s,v=%s\n",
                                 record.partition(), record.offset(), record.timestamp(),
                                 Instant.ofEpochMilli(record.timestamp()), keyString, valueString);
+
+                        if (!StringUtils.isEmpty(grep)) {
+                            helper.increaseGrepHit();
+                        }
                     }
 
                     helper.visitRecord(record);
 
                     if (helper.hasReachedGrepOrTotalLimit()) {
-                        console.printf("# total limit %d or grep limit %d reached, exit", config.getLimit(), config.getGrepLimit());
+                        report(console, config, helper, consumer, grep);
                         return;
                     }
                 }
 
-                console.log("command.isExitWhenEndReached():" + command.isExitWhenEndReached());
                 if (command.isExitWhenEndReached() && helper.hasReachedTopicEnd()) {
-                    console.log("Topic offset reached, exit");
-                    console.log("visited offsets:" + helper.getVisitedOffsets());
+                    report(console, config, helper, consumer, grep);
                     return;
                 }
             }
         } finally {
             consumer.close();
         }
+    }
+
+    private static void report(ConsoleHelper console, ConsumerConfigHelper config, ConsumerHelper helper, Consumer<Object, Object> consumer, String grep) {
+        console.log("\n------------------------------Summary------------------------------");
+        console.logf("# topic: %s, partition: %s, offset: %s, grep: %s",
+                config.getTopic(), config.getPartitionOrNull(), config.geOffsetOrNull(), grep);
+        console.logf(" from_epoch: %d, backward_duration: %d\n",
+                config.getFromEpochOrNull(), config.getBackwardDurationOrNull());
+        console.logf("# total limit: %d, grep limit: %d\n", config.getLimit(), config.getGrepLimit());
+        console.logf("# total visited: %d: grep hit: %d\n", helper.getVisitCount(), helper.getGrepHit());
+        console.log("# earliest visited offsets:" + helper.getEarliestVisitedOffsets());
+        console.log("# latest visited offsets:" + helper.getLatestVisitedOffsets());
+        console.log("# end offsets of the topic:" + consumer.endOffsets(consumer.assignment()));
     }
 
     private static String valueStringToLog(Object value) {

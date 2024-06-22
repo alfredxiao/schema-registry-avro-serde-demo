@@ -6,7 +6,7 @@ public class ConsoleHelper {
         System.out.println(msg);
     }
 
-    public void printf(String format, Object ... args) {
+    public void logf(String format, Object ... args) {
         System.out.printf(format, args);
     }
 }

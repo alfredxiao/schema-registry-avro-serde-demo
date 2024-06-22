@@ -1,14 +1,25 @@
 package xiaoyf.demo.schemaregistry.tools.consoleconsumer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.CommandLineHelper._BACKWARD_DURATION;
+import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.CommandLineHelper._FROM_EPOCH;
+import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.CommandLineHelper._GREP_LIMIT;
+import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.CommandLineHelper._LIMIT;
+import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.CommandLineHelper._OFFSET;
+import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.CommandLineHelper._PARTITION;
+import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.CommandLineHelper._TOPIC;
+import static xiaoyf.demo.schemaregistry.tools.consoleconsumer.CommandLineHelper._VALUE_FIELDS;
 
 
 public class ConsumerConfigHelper {
@@ -17,13 +28,9 @@ public class ConsumerConfigHelper {
     public static final String DEFAULT_KEY_DESERIALIZER = StringDeserializer.class.getName();
     //  avro uses io.confluent.kafka.serializers.KafkaAvroDeserializer.class
     public static final String DEFAULT_VALUE_DESERIALIZER = StringDeserializer.class.getName();
-    public static final String ALL_PARTITIONS = "all";
-    public static final int ALL_PARTITION = -1;
     public static final String FROM_BEGINNING = "beginning";
-    public static final int FROM_BEGINNING_OFFSET = -1;
     public static final String FROM_END = "end";
     public static final int FROM_END_OFFSET = -2;
-    public static final String UNLIMITED = "-1";
 
     private final CommandLineHelper command;
 
@@ -60,8 +67,8 @@ public class ConsumerConfigHelper {
     public Set<String> valueFields() {
         Set<String> fields = new HashSet<>();
 
-        String valueFieldsArg = command.getValueFields();
-        if (!valueFieldsArg.isBlank()) {
+        String valueFieldsArg = command.getOptionOrNull(_VALUE_FIELDS);
+        if (!StringUtils.isBlank(valueFieldsArg)) {
             fields = Arrays.stream(valueFieldsArg.split(","))
                     .map(String::trim)
                     .collect(Collectors.toSet());
@@ -71,36 +78,46 @@ public class ConsumerConfigHelper {
     }
 
     public String getTopic() {
-        return command.getTopic();
+        return command.getOptionOrNull(_TOPIC);
     }
 
-    public int getFromOffset() {
-        String offset = command.getFromOffset(FROM_BEGINNING);
-        switch (offset) {
-            case FROM_BEGINNING:
-                return FROM_BEGINNING_OFFSET;
-            case FROM_END:
-                return FROM_END_OFFSET;
-            default:
-                return Integer.parseInt(offset);
-        }
-    }
+    public Integer geOffsetOrNull() {
+        String offset = command.getOptionOrNull(_OFFSET);
 
-    public int getPartition() {
-        String partition = command.getPartition(ALL_PARTITIONS);
-
-        if (ALL_PARTITIONS.equals(partition)) {
-            return ALL_PARTITION;
+        if (offset == null) {
+            return null;
         }
 
-        return Integer.parseInt(partition);
+        return switch (offset) {
+            case FROM_BEGINNING -> null;
+            case FROM_END -> FROM_END_OFFSET;
+            default -> Integer.parseInt(offset);
+        };
     }
 
-    public int getLimit() {
-        return Integer.parseInt(command.getLimit(UNLIMITED));
+    public Integer getPartitionOrNull() {
+        String partition = command.getOptionOrNull(_PARTITION);
+
+        return partition == null ? null : Integer.parseInt(partition);
     }
 
-    public int getGrepLimit() {
-        return Integer.parseInt(command.getGrepLimit(UNLIMITED));
+    public Integer getLimit() {
+        String limit = command.getOptionOrNull(_LIMIT);
+        return limit == null ? null : Integer.parseInt(limit);
+    }
+
+    public Integer getGrepLimit() {
+        String grepLimit = command.getOptionOrNull(_GREP_LIMIT);
+        return grepLimit == null ? null : Integer.parseInt(grepLimit);
+    }
+
+    public Long getFromEpochOrNull() {
+        String fromEpoch = command.getOptionOrNull(_FROM_EPOCH);
+        return fromEpoch == null ? null : Long.parseLong(fromEpoch);
+    }
+
+    public Long getBackwardDurationOrNull() {
+        String backwardDuration = command.getOptionOrNull(_BACKWARD_DURATION);
+        return backwardDuration == null ? null : Duration.parse(backwardDuration).toMillis();
     }
 }
