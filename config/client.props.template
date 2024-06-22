@@ -1,0 +1,7 @@
+security.protocol: SASL_SSL
+sasl.mechanism: PLAIN
+sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username='<USERNAME>' password='<PASSWORD>';
+bootstrap.servers: HOSTNAME:9092
+schema.registry.url: https://SR_URL
+basic.auth.user.info: SR_USERNAME:SR_PASSWORD
+basic.auth.credentials.source: USER_INFO
